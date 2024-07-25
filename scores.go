@@ -11,9 +11,12 @@ import (
 
 type Score struct {
 	PlayerAccountIDs []string
-	Value            int64
-	Date             time.Time
-	Country          string
+	// Either a score, or a number of frames
+	Value int64
+	// 0 = score. 1 = speed run.
+	Type    int32
+	Date    time.Time
+	Country string
 }
 
 type LevelData struct {
@@ -21,14 +24,14 @@ type LevelData struct {
 	Scores2p []Score
 }
 
-type PlayerScore struct {
+type PlayerRank struct {
 	AccountID        string
 	AccumulatedScore float64
 	Country          string
 	NumberOfWRs      int
 }
 
-func ComputePlayerScores(levelData map[ppl_json.LevelFullID]LevelData) []PlayerScore {
+func ComputePlayerScores(levelData map[ppl_json.LevelFullID]LevelData) []PlayerRank {
 	type PlayerTempScore struct {
 		AccumulatedScore     float64
 		AccumulatedCountries []string
@@ -56,7 +59,7 @@ func ComputePlayerScores(levelData map[ppl_json.LevelFullID]LevelData) []PlayerS
 		}
 	}
 
-	output := make([]PlayerScore, 0)
+	output := make([]PlayerRank, 0)
 	for k, v := range temp {
 		country := ""
 		if len(v.AccumulatedCountries) == 1 {
@@ -64,7 +67,7 @@ func ComputePlayerScores(levelData map[ppl_json.LevelFullID]LevelData) []PlayerS
 		} else {
 			country = helpers.MostFrequentString(v.AccumulatedCountries)
 		}
-		output = append(output, PlayerScore{k, v.AccumulatedScore, country, v.NumberOfWRs})
+		output = append(output, PlayerRank{k, v.AccumulatedScore, country, v.NumberOfWRs})
 	}
 
 	sort.SliceStable(output, func(i, j int) bool {
