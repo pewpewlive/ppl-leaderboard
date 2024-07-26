@@ -1,12 +1,10 @@
 package leaderboard
 
 import (
-	"math"
 	"sort"
 	"time"
 
-	"github.com/pewpewlive/common-go/helpers"
-	"github.com/pewpewlive/common-go/ppl_json"
+	"github.com/pewpewlive/common-go/ppl_types"
 )
 
 type Score struct {
@@ -19,11 +17,6 @@ type Score struct {
 	Country string
 }
 
-type LevelData struct {
-	Scores1p []Score
-	Scores2p []Score
-}
-
 type PlayerRank struct {
 	AccountID        string
 	AccumulatedScore float64
@@ -31,44 +24,56 @@ type PlayerRank struct {
 	NumberOfWRs      int
 }
 
-func ComputePlayerScores(levelData map[ppl_json.LevelFullID]LevelData) []PlayerRank {
+func ComputePlayerScores(levelData []ppl_types.HofEntry) []PlayerRank {
 	type PlayerTempScore struct {
 		AccumulatedScore     float64
 		AccumulatedCountries []string
 		NumberOfWRs          int
 	}
 
-	temp := map[string]PlayerTempScore{}
+	// scores1p := slices.DeleteFunc(levelData, func(level ppl_types.HofEntry) bool {
+	// 	return len(level.PlayerAccountIDs) != 1 || level.ValueType == 1
+	// })
+	// scores2p := slices.DeleteFunc(levelData, func(level ppl_types.HofEntry) bool {
+	// 	return len(level.PlayerAccountIDs) != 2 || level.ValueType == 1
+	// })
+	// speedruns1p := slices.DeleteFunc(levelData, func(level ppl_types.HofEntry) bool {
+	// 	return len(level.PlayerAccountIDs) != 1 || level.ValueType == 0
+	// })
+	// speedruns2p := slices.DeleteFunc(levelData, func(level ppl_types.HofEntry) bool {
+	// 	return len(level.PlayerAccountIDs) != 2 || level.ValueType == 0
+	// })
 
-	for _, data := range levelData {
-		numerator := math.Pow(float64(len(data.Scores1p)), 1.0/6.0) * 100.0
+	// temp := map[string]PlayerTempScore{}
 
-		rank := 1
-		for _, score := range data.Scores1p {
-			// performance = (total_scores^(1/6)) * 100 / (((rank+1) / 2) ^ (1/2))
-			denominator := math.Sqrt(float64(rank) / 2.0)
-			delta := numerator / denominator
-			var pData = temp[score.PlayerAccountIDs[0]]
-			if rank == 1 {
-				pData.NumberOfWRs++
-			}
-			pData.AccumulatedScore += delta
-			pData.AccumulatedCountries = append(pData.AccumulatedCountries, score.Country)
-			temp[score.PlayerAccountIDs[0]] = pData
-			rank++
-		}
-	}
+	// for _, data := range scores1p {
+	// 	numerator := math.Pow(float64(len(scores1p)), 1.0/6.0) * 100.0
+
+	// 	rank := 1
+	// 	for _, score := range data.Scores1p {
+	// 		// performance = (total_scores^(1/6)) * 100 / (((rank+1) / 2) ^ (1/2))
+	// 		denominator := math.Sqrt(float64(rank) / 2.0)
+	// 		delta := numerator / denominator
+	// 		pData := temp[score.PlayerAccountIDs[0]]
+	// 		if rank == 1 {
+	// 			pData.NumberOfWRs++
+	// 		}
+	// 		pData.AccumulatedScore += delta
+	// 		pData.AccumulatedCountries = append(pData.AccumulatedCountries, score.Country)
+	// 		temp[score.PlayerAccountIDs[0]] = pData
+	// 		rank++
+	// 	}
+	// }
 
 	output := make([]PlayerRank, 0)
-	for k, v := range temp {
-		country := ""
-		if len(v.AccumulatedCountries) == 1 {
-			country = v.AccumulatedCountries[0]
-		} else {
-			country = helpers.MostFrequentString(v.AccumulatedCountries)
-		}
-		output = append(output, PlayerRank{k, v.AccumulatedScore, country, v.NumberOfWRs})
-	}
+	// for k, v := range temp {
+	// 	output = append(output, PlayerRank{
+	// 		AccountID:        k,
+	// 		AccumulatedScore: v.AccumulatedScore,
+	// 		Country:          helpers.MostFrequentString(v.AccumulatedCountries),
+	// 		NumberOfWRs:      v.NumberOfWRs,
+	// 	})
+	// }
 
 	sort.SliceStable(output, func(i, j int) bool {
 		return output[i].AccumulatedScore > output[j].AccumulatedScore

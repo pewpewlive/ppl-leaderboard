@@ -1,2 +1,6 @@
 github.com/pewpewlive/common-go v0.0.0-20240724153204-93bd8bd938b1 h1:FJHuCfhdf2Le7Q0ZSFNanalRBTX7gkgSXlLoTvk7dJs=
 github.com/pewpewlive/common-go v0.0.0-20240724153204-93bd8bd938b1/go.mod h1:JvBbjgxYQc1Qbfj1rgsafvUgzc6LKbkMGfmpJisft/Y=
+github.com/pewpewlive/common-go v0.0.0-20240724203356-025c6e6cb70c h1:YUo8vtG7idlKAPfLwZodMcUCRFRzFsqxw7ZJ6MfB7WU=
+github.com/pewpewlive/common-go v0.0.0-20240724203356-025c6e6cb70c/go.mod h1:JvBbjgxYQc1Qbfj1rgsafvUgzc6LKbkMGfmpJisft/Y=
+github.com/pewpewlive/common-go v0.0.0-20240726164819-ee0cf5b7494f h1:/EP6FUCsKpRHjv6XoM5Besf4kzRbZn8UQdF1UPx+IYQ=
+github.com/pewpewlive/common-go v0.0.0-20240726164819-ee0cf5b7494f/go.mod h1:JvBbjgxYQc1Qbfj1rgsafvUgzc6LKbkMGfmpJisft/Y=
