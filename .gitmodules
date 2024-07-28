@@ -1,0 +1,3 @@
+[submodule "cmd/data"]
+	path = cmd/data
+	url = https://github.com/pewpewlive/ppl-data
