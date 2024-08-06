@@ -112,6 +112,7 @@ func GetScoreMapFromScores(scores []ppl_types.HofEntry, accountMap map[string]st
 	return data
 }
 
+// Utility function to directly read a CSV file. Uses GetScoreMapFromScores inside
 func GetScoreMapFromCSV(path string, accountMap map[string]string) []LevelLeaderboard {
 	file, err := os.OpenFile(path, os.O_RDONLY, os.ModePerm)
 	if err != nil {
@@ -177,6 +178,7 @@ func ComputePlayerRanks(levelLeaderboards []LevelLeaderboard) []PlayerRank {
 	return ranks
 }
 
+// Returns a jsonified version of the player ranks
 func JsonifyRanks(playerRanks []PlayerRank, accountMap map[string]string) (string, error) {
 	ranks := []interface{}{}
 	for _, v := range playerRanks {

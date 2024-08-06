@@ -8,3 +8,7 @@ github.com/pewpewlive/common-go v0.0.0-20240726164819-ee0cf5b7494f h1:/EP6FUCsKp
 github.com/pewpewlive/common-go v0.0.0-20240726164819-ee0cf5b7494f/go.mod h1:JvBbjgxYQc1Qbfj1rgsafvUgzc6LKbkMGfmpJisft/Y=
 github.com/pewpewlive/common-go v0.0.0-20240728174315-dd2d68ab7fde h1:+I6ftw/qxg35pXbZSm8KpaE7HK05Smkm12cOh634zfo=
 github.com/pewpewlive/common-go v0.0.0-20240728174315-dd2d68ab7fde/go.mod h1:JvBbjgxYQc1Qbfj1rgsafvUgzc6LKbkMGfmpJisft/Y=
+github.com/pewpewlive/common-go v0.0.0-20240806052640-fe05f82f2c8a h1:bGG4wxTXBJ2kcsLndtVPMVtLubFPLZpTVMvoBlIfgCk=
+github.com/pewpewlive/common-go v0.0.0-20240806052640-fe05f82f2c8a/go.mod h1:pPHy5P1T1jjqvzt7ONAWgd75OSeCNDNu16zzb8Eab40=
+github.com/pewpewlive/common-go v0.0.0-20240806053419-e6169e80304a h1:7o228/L0JmChH4YSQjCP2Z9kQndp4ZJsfZyyTVZ/KTw=
+github.com/pewpewlive/common-go v0.0.0-20240806053419-e6169e80304a/go.mod h1:pPHy5P1T1jjqvzt7ONAWgd75OSeCNDNu16zzb8Eab40=
