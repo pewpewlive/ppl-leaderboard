@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/gocarina/gocsv"
 	"github.com/pewpewlive/common-go/helpers"
 	"github.com/pewpewlive/common-go/ppl_types"
 )
@@ -29,8 +27,14 @@ func SortScores(scores []ppl_types.HofEntry) {
 }
 
 // Maps player scores to a given level UUID with leaderboard type and player count
-func GetScoreMapFromScores(scores []ppl_types.HofEntry, accountMap map[string]string) []LevelLeaderboard {
+func GetLeaderboardsFromScores(scores []ppl_types.HofEntry, accounts []ppl_types.AccountInfo) []LevelLeaderboard {
 	data := make([]LevelLeaderboard, 0)
+
+	// Create a map, from account IDs to account usernames.
+	accountMap := map[string]string{}
+	for _, account := range accounts {
+		accountMap[account.AccountID] = account.Username
+	}
 
 	// Create a temporary level leaderboard map based on score features
 	levels := map[string][]ppl_types.HofEntry{}
@@ -108,23 +112,6 @@ func GetScoreMapFromScores(scores []ppl_types.HofEntry, accountMap map[string]st
 	for _, leaderboard := range data {
 		SortScores(leaderboard.Scores)
 	}
-
-	return data
-}
-
-// Utility function to directly read a CSV file. Uses GetScoreMapFromScores inside
-func GetScoreMapFromCSV(path string, accountMap map[string]string) []LevelLeaderboard {
-	file, err := os.OpenFile(path, os.O_RDONLY, os.ModePerm)
-	if err != nil {
-		return nil
-	}
-
-	var scores []ppl_types.HofEntry
-	if gocsv.UnmarshalFile(file, &scores) != nil {
-		return nil
-	}
-
-	data := GetScoreMapFromScores(scores, accountMap)
 
 	return data
 }
