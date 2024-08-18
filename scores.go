@@ -13,6 +13,15 @@ import (
 	"github.com/pewpewlive/common-go/ppl_types"
 )
 
+var LevelInBlacklist = map[string]bool{
+	// "Om8xrkBMgDfX4fuyJYVk1": true, // Pew-Man
+	"HpfC42TNwH5AEmvWkkQof": true, // Simon Says
+	// "ZlxFwr1dXdXsZslFNyzL_": true, // Inertiacs spawner
+	// "81TpajqWIlSXYmZrfjSjw": true, // Inertiac World
+	"7fa9_mUjTldAgdgDmrB4q": true, // Don't touch grass
+	"xo8lychHUy7lass08Cyjb": true, // Pew Pong
+}
+
 // Sorts the scores based on their value and date
 func SortScores(scores []ppl_types.HofEntry) {
 	sort.SliceStable(scores, func(i, j int) bool {
@@ -157,6 +166,10 @@ func ComputePlayerRanks(levelLeaderboards []LevelLeaderboard) []PlayerRank {
 	playerRanks := map[string]tempPlayerRank{}
 
 	for _, leaderboard := range levelLeaderboards {
+		if LevelInBlacklist[leaderboard.LevelUUID] {
+			continue
+		}
+
 		ComputeRankForGivenScores(leaderboard.Scores, playerRanks)
 	}
 
