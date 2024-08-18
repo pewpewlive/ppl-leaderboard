@@ -121,20 +121,32 @@ func ComputeRankForGivenScores(scores []ppl_types.HofEntry, playerRanks map[stri
 	numerator := math.Pow(float64(len(scores)), 1.0/6.0) * 100.0
 
 	rank := 1
+
+	// Keep track of already counted players
+	countedAccounts := map[string]bool{}
 	for _, score := range scores {
 		// performance = (total_scores^(1/6)) * 100 / (((rank+1) / 2) ^ (1/2))
 		denominator := math.Sqrt(float64(rank) / 2.0)
 		delta := numerator / denominator
 
 		accountIDs := strings.Split(score.PlayerAccountIDs, "|")
+
 		for _, player := range accountIDs {
+			if countedAccounts[player] {
+				// Skip the player's score if it is already accounted for the leaderboard
+				continue
+			}
+
 			playerData := playerRanks[player]
 			if rank == 1 {
 				playerData.NumberOfWRs++
 			}
+
 			playerData.AccumulatedScore += delta
 			playerData.AccumulatedCountries = append(playerData.AccumulatedCountries, score.Country)
 			playerRanks[player] = playerData
+
+			countedAccounts[player] = true
 		}
 		rank++
 	}

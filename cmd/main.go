@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/pewpewlive/common-go/helpers"
 	leaderboard "github.com/pewpewlive/ppl-leaderboard"
 )
 
@@ -17,14 +18,17 @@ func main() {
 		log.Fatal(accountsErr)
 	}
 
+	accountMap := map[string]string{}
+	for _, account := range accounts {
+		accountMap[account.AccountID] = account.Username
+	}
+
 	leaderboards := leaderboard.GetLeaderboardsFromScores(scores, accounts)
 	ranks := leaderboard.ComputePlayerRanks(leaderboards)
 
-	fmt.Printf("The account IDs of the top 10 ranks:\n")
-	for i, rank := range ranks {
-		fmt.Printf("%d. %s\n", i, rank.AccountID)
-		if i > 10 {
-			return
-		}
+	fmt.Printf("The top 10 players:\n")
+	for i, rank := range ranks[:10] {
+		accountName := helpers.StripColorsFromString(accountMap[rank.AccountID])
+		fmt.Printf("%d. %s (%s) - Score: %.4f, WRs: %d\n", i+1, accountName, rank.AccountID, rank.AccumulatedScore, rank.NumberOfWRs)
 	}
 }
