@@ -29,6 +29,6 @@ func main() {
 	fmt.Printf("The top 10 players:\n")
 	for i, rank := range ranks[:10] {
 		accountName := helpers.StripColorsFromString(accountMap[rank.AccountID])
-		fmt.Printf("%d. %s (%s) - Score: %.4f, WRs: %d\n", i+1, accountName, rank.AccountID, rank.AccumulatedScore, rank.NumberOfWRs)
+		fmt.Printf("%d. %s (%s) - Score: %.2f, WRs: %d\n", i+1, accountName, rank.AccountID, rank.AccumulatedScore, rank.NumberOfWRs)
 	}
 }

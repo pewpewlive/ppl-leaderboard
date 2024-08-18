@@ -187,7 +187,7 @@ func JsonifyRanks(playerRanks []PlayerRank, accountMap map[string]string) (strin
 			continue
 		}
 
-		ranks = append(ranks, v.AccountID, nickname, v.AccumulatedScore, v.Country, v.NumberOfWRs)
+		ranks = append(ranks, v.AccountID, nickname, math.Round(v.AccumulatedScore*100)/100, v.Country, v.NumberOfWRs)
 	}
 
 	jsonStr, err := json.Marshal(ranks)
