@@ -2,10 +2,8 @@ package leaderboard
 
 import (
 	"encoding/json"
-	"fmt"
 	"math"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -35,6 +33,13 @@ func SortScores(scores []ppl_types.HofEntry) {
 	})
 }
 
+type LeaderboardKey struct {
+	LevelUUID    string
+	LevelVersion int32
+	ValueType    int32
+	PlayerCount  int32
+}
+
 // Maps player scores to a given level UUID with leaderboard type and player count
 func GetLeaderboardsFromScores(scores []ppl_types.HofEntry, accounts []ppl_types.AccountInfo) []LevelLeaderboard {
 	data := make([]LevelLeaderboard, 0)
@@ -45,8 +50,7 @@ func GetLeaderboardsFromScores(scores []ppl_types.HofEntry, accounts []ppl_types
 		accountMap[account.AccountID] = account.Username
 	}
 
-	// Create a temporary level leaderboard map based on score features
-	levels := map[string][]ppl_types.HofEntry{}
+	leaderboards := map[LeaderboardKey][]ppl_types.HofEntry{}
 
 	for _, score := range scores {
 		accountIDs := strings.Split(score.PlayerAccountIDs, "|")
@@ -63,16 +67,20 @@ func GetLeaderboardsFromScores(scores []ppl_types.HofEntry, accounts []ppl_types
 			continue
 		}
 
-		// Making a key using a combination of level uuid, level version, player count and value type
-		leaderboard := fmt.Sprintf("%s@%d@%d@%d", score.LevelUUID, score.LevelVersion, len(accountIDs), score.ValueType)
-
-		// Create a new level entry if it's missing one
-		if _, exists := levels[leaderboard]; !exists {
-			levels[leaderboard] = []ppl_types.HofEntry{}
+		leaderboardKey := LeaderboardKey{
+			LevelUUID:    score.LevelUUID,
+			LevelVersion: score.LevelVersion,
+			PlayerCount:  int32(len(accountIDs)),
+			ValueType:    score.ValueType,
 		}
 
-		// Finally add the score to the level leaderboard
-		levels[leaderboard] = append(levels[leaderboard], ppl_types.HofEntry{
+		// Create a new leaderboard entry if necessary
+		if _, exists := leaderboards[leaderboardKey]; !exists {
+			leaderboards[leaderboardKey] = []ppl_types.HofEntry{}
+		}
+
+		// Add the score to the leaderboard
+		leaderboards[leaderboardKey] = append(leaderboards[leaderboardKey], ppl_types.HofEntry{
 			PlayerAccountIDs: score.PlayerAccountIDs,
 			LevelUUID:        score.LevelUUID,
 			LevelVersion:     score.LevelVersion,
@@ -84,36 +92,26 @@ func GetLeaderboardsFromScores(scores []ppl_types.HofEntry, accounts []ppl_types
 	}
 
 	// Find highest version of every level
-	highestVersionOfLevel := map[string]int64{}
-	for key := range levels {
-		levelKey := strings.Split(key, "@")
-		currentMax := highestVersionOfLevel[levelKey[0]]
-		version, _ := strconv.ParseInt(levelKey[1], 10, 64)
-		if currentMax < version {
-			highestVersionOfLevel[levelKey[0]] = version
-		}
+	highestVersionOfLevel := map[string]int32{}
+	for key := range leaderboards {
+		highestVersionOfLevel[key.LevelUUID] = max(highestVersionOfLevel[key.LevelUUID], key.LevelVersion)
 	}
 
-	// Delete every entry from a version that is not the latest one
-	for key := range levels {
-		levelKey := strings.Split(key, "@")
-		version, _ := strconv.ParseInt(levelKey[1], 10, 64)
-		if version < highestVersionOfLevel[levelKey[0]] {
-			delete(levels, key)
+	// Delete every leaderboard associated with a level that is not at the latest version.
+	for key := range leaderboards {
+		if key.LevelVersion < highestVersionOfLevel[key.LevelUUID] {
+			delete(leaderboards, key)
 		}
 	}
 
 	// Populate the actual data
-	for level, scores := range levels {
-		levelKey := strings.Split(level, "@")
-		playerCount, _ := strconv.ParseInt(levelKey[2], 10, 64)
-		leaderboardType, _ := strconv.ParseInt(levelKey[3], 10, 64)
+	for key, leaderboard := range leaderboards {
 
 		data = append(data, LevelLeaderboard{
-			LevelUUID:       levelKey[0],
-			LeaderboardType: int32(leaderboardType),
-			PlayerCount:     int32(playerCount),
-			Scores:          scores,
+			LevelUUID:       key.LevelUUID,
+			LeaderboardType: key.ValueType,
+			PlayerCount:     key.PlayerCount,
+			Scores:          leaderboard,
 		})
 	}
 
