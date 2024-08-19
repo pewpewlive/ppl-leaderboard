@@ -51,10 +51,48 @@ func TestSortScores(t *testing.T) {
 	assert.Equal(t, expectedSortedScores, unsortedScores)
 }
 
-func TestGetScoreMapFromScores(t *testing.T) {
-	scores := []ppl_types.HofEntry{}
-	accounts := []ppl_types.AccountInfo{}
-	leaderboard := GetLeaderboardsFromScores(scores, accounts)
-	expectedLeaderboard := []LevelLeaderboard{}
-	assert.Equal(t, expectedLeaderboard, leaderboard)
+func TestGetLeaderboardsFromScores_MultipleLevelVersion(t *testing.T) {
+	// Test that only the latest version of a level is kept
+	scores := []ppl_types.HofEntry{
+		{PlayerAccountIDs: "foo", LevelUUID: "level1", LevelVersion: 1, Value: 10, ValueType: 0},
+		{PlayerAccountIDs: "bar", LevelUUID: "level1", LevelVersion: 3, Value: 30, ValueType: 0},
+		{PlayerAccountIDs: "qux", LevelUUID: "level1", LevelVersion: 2, Value: 20, ValueType: 0},
+	}
+	accounts := []ppl_types.AccountInfo{
+		{AccountID: "bar", Username: "Bar"},
+	}
+	leaderboards := GetLeaderboardsFromScores(scores, accounts)
+	expectedLeaderboard := []LevelLeaderboard{
+		{
+			LevelUUID:       "level1",
+			LeaderboardType: 0,
+			PlayerCount:     1,
+			Scores:          []ppl_types.HofEntry{{PlayerAccountIDs: "bar", LevelUUID: "level1", LevelVersion: 3, Value: 30, ValueType: 0}},
+		},
+	}
+	assert.Equal(t, expectedLeaderboard, leaderboards)
+}
+
+func TestGetLeaderboardsFromScores_AccountsDeleted(t *testing.T) {
+	// Test that accounts that don't exist anymore are ignored
+	scores := []ppl_types.HofEntry{
+		{PlayerAccountIDs: "foo", LevelUUID: "level1", Value: 10, ValueType: 0},
+		{PlayerAccountIDs: "bar", LevelUUID: "level1", Value: 20, ValueType: 0},
+		{PlayerAccountIDs: "qux", LevelUUID: "level1", Value: 30, ValueType: 0},
+	}
+	accounts := []ppl_types.AccountInfo{
+		{AccountID: "foo", Username: "Foo"},
+		{AccountID: "qux", Username: "Qux"},
+	}
+	leaderboards := GetLeaderboardsFromScores(scores, accounts)
+	expectedLeaderboard := []LevelLeaderboard{
+		{
+			LevelUUID:       "level1",
+			LeaderboardType: 0,
+			PlayerCount:     1,
+			Scores: []ppl_types.HofEntry{{PlayerAccountIDs: "qux", LevelUUID: "level1", Value: 30, ValueType: 0},
+				{PlayerAccountIDs: "foo", LevelUUID: "level1", Value: 10, ValueType: 0}},
+		},
+	}
+	assert.Equal(t, expectedLeaderboard, leaderboards)
 }
