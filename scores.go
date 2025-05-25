@@ -132,8 +132,8 @@ func ComputeRankForGivenScores(scores []ppl_types.HofEntry, playerRanks map[stri
 	// Keep track of already counted players
 	countedAccounts := map[string]bool{}
 	for _, score := range scores {
-		// performance = (total_scores^(1/6)) * 100 / (((rank+1) / 2) ^ (1/2))
-		denominator := math.Sqrt(float64(rank) / 2.0)
+		// performance = (total_scores^(1/6)) * 100 / ((rank+1) ^ (1/2))
+		denominator := math.Sqrt(float64(rank))
 		delta := numerator / denominator
 
 		accountIDs := strings.Split(score.PlayerAccountIDs, "|")
